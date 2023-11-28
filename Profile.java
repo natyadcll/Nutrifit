@@ -44,161 +44,7 @@ public class Profile extends JFrame {
 
 	}
 
-	public boolean checkNameExists(final String name) {
-		// Check if name already exists in the database
-		Connection con1 = connection.connectDB();
-		try {
-
-			String sql = "SELECT COUNT(*) FROM new_schema.profile WHERE name = ?";
-			PreparedStatement ps = con1.prepareStatement(sql);
-			ps.setString(1, name);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				int count = resultSet.getInt(1);
-				return count > 0; // this means name exists
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			// Handle any database connection or query errors.
-		}
-
-		return false; // Return false in case of an error.
-	}
-
-	public boolean weightHeightValid(String entry) {
-		// Check if a string can be parsed as a valid weight or height
-		try {
-			double entry1 = Double.parseDouble(entry);
-
-		} catch (NumberFormatException ex) {
-			return false;
-		}
-		return true;
-	}
-
-	public boolean dateCorrect(String date) {
-		 // Check if a date string is in the correct format (YYYY-MM-DD)
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); //this is the format we want it
-		dateFormat.setLenient(false);
-		try {
-			Date newdate = (Date) dateFormat.parse(date);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(newdate);
-			int year = calendar.get(Calendar.YEAR);
-	        int month = calendar.get(Calendar.MONTH) + 1; // this makes sure that month is 0# format
-	        int day = calendar.get(Calendar.DAY_OF_MONTH);
-	        if (year >= 1 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-	            return true; 
-	        }
-		} catch (ParseException | ClassCastException e) { //makes sure can be casted as type date
-			return false;
-		}
-		return false;
-	}
-
-	public String getSex(final String name) {
-		//associated with name
-		String sex = null;
-		Connection con1 = connection.connectDB();
-		try {
-
-			String sql = "SELECT * FROM new_schema.profile WHERE name = ?";
-			PreparedStatement ps = con1.prepareStatement(sql);
-			ps.setString(1, name);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				sex = resultSet.getString("sex");
-				con1.close();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return sex;
-	}
-
-	public int getHeight(final String name) {
-		//associated with name
-		int height = 0;
-		Connection con1 = connection.connectDB();
-		try {
-
-			String sql = "SELECT * FROM new_schema.profile WHERE name = ?";
-			PreparedStatement ps = con1.prepareStatement(sql);
-			ps.setString(1, name);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				height = resultSet.getInt("height");
-				con1.close();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return height;
-	}
-
-	public int getWeight(final String name) {
-		//associated with name
-		int weight = 0;
-		Connection con1 = connection.connectDB();
-		try {
-
-			String sql = "SELECT * FROM new_schema.profile WHERE name = ?";
-			PreparedStatement ps = con1.prepareStatement(sql);
-			ps.setString(1, name);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				weight = resultSet.getInt("weight");
-				con1.close();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return weight;
-	}
-
-	public String getDate(final String name) {
-		String date = null;
-		Connection con1 = connection.connectDB();
-		try {
-
-			String sql = "SELECT * FROM new_schema.profile WHERE name = ?";
-			PreparedStatement ps = con1.prepareStatement(sql);
-			ps.setString(1, name);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				date = resultSet.getString("date");
-				con1.close();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return date;
-	}
-
-	public String getunit(final String name) {
-		String sex = null;
-		Connection con1 = connection.connectDB();
-		try {
-
-			String sql = "SELECT * FROM new_schema.profile WHERE name = ?";
-			PreparedStatement ps = con1.prepareStatement(sql);
-			ps.setString(1, name);
-			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				sex = resultSet.getString("units");
-				con1.close();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return sex;
-	}
+	
 
 	public void AccountManager() {
 		
@@ -260,12 +106,12 @@ public class Profile extends JFrame {
 					AccountManager();
 				} else {
 
-					if (checkNameExists(name) == true) {
+					if (ProfileGetandSet.checkNameExists(name) == true) {
 						JOptionPane.showMessageDialog(null, "Name already exists");
 						AccountManager();
 					}
-					if (weightHeightValid(weight) == false && weightHeightValid(height) == false
-							|| dateCorrect(date) == false) {
+					if (ProfileGetandSet.weightHeightValid(weight) == false && ProfileGetandSet.weightHeightValid(height) == false
+							|| ProfileGetandSet.dateCorrect(date) == false) {
 						JOptionPane.showMessageDialog(null, "please enter a valid height, weight, and date");
 						AccountManager();
 					} else {
@@ -353,11 +199,11 @@ public class Profile extends JFrame {
 
 	public void ProfileView(final String name) {
 		// display the profile data and provide an option to edit
-		final String sex = getSex(name);
-		final int height = getHeight(name);
-		final int weight = getWeight(name);
-		final String date = getDate(name);
-		final String units = getunit(name);
+		final String sex = ProfileGetandSet.getSex(name);
+		final int height = ProfileGetandSet.getHeight(name);
+		final int weight = ProfileGetandSet.getWeight(name);
+		final String date = ProfileGetandSet.getDate(name);
+		final String units = ProfileGetandSet.getunit(name);
 		String w = "lbs";
 		String h = "in";
 		if (units.equals("M")) {
@@ -470,13 +316,13 @@ public class Profile extends JFrame {
 				if (name1.isEmpty()) {
 					name1 = name;
 				}
-				if (height1.isEmpty() || !weightHeightValid(height1)) {
+				if (height1.isEmpty() || !ProfileGetandSet.weightHeightValid(height1)) {
 					height1 = Integer.toString(height);
 				}
-				if (weight1.isEmpty() || !weightHeightValid(weight1)) {
+				if (weight1.isEmpty() || !ProfileGetandSet.weightHeightValid(weight1)) {
 					weight1 = Integer.toString(weight);
 				}
-				if (date1.isEmpty() || !dateCorrect(date)) {
+				if (date1.isEmpty() || !ProfileGetandSet.dateCorrect(date)) {
 					date1 = date;
 				}
 				// call sendForReview to update the profile data
